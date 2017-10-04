@@ -1,0 +1,41 @@
+#!/bin/bash
+
+UPTIME_DAYS=$(expr `cat /proc/uptime | cut -d '.' -f1` % 31556926 / 86400)
+UPTIME_HOURS=$(expr `cat /proc/uptime | cut -d '.' -f1` % 31556926 % 86400 / 3600)
+UPTIME_MINS=$(expr `cat /proc/uptime | cut -d '.' -f1` % 31556926 % 86400 % 3600 / 60)
+PUBLIC_AVAIL=$(expr `df -h | head -n 10 | tail -n 1 | awk '{ a = $2 } END {print a }'`)
+PUBLIC_USED=$(expr `df -h | head -n 10 | tail -n 1 | awk '{ a = $3 } END {print a }'`)
+PUBLIC_FREE=$(expr `df -h | head -n 10 | tail -n 1 | awk '{ a = $4 } END {print a }'`)
+PUBLIC_PCT=$(expr `df -h | head -n 10 | tail -n 1 | awk '{ a = $5 } END {print a }'`)
+
+#SERVICES
+check_service() {
+    GREEN="\e[92m"
+    RED="\e[31m"
+    END_COLOR="\e[0m"
+
+    if [ `systemctl is-active $1` == "active" ]; then
+        echo -e "${GREEN}${1}${END_COLOR}"
+    else
+        echo -e "${RED}${1}${END_COLOR}"
+    fi;
+}
+
+echo "
+
+"
+
+cat /etc/update-motd.d/banner.txt | toilet -f term --gay
+
+        # Show Swap Values
+        #Swap: `free -m | tail -n 1 | awk {'print $4'}`M | `free -m | tail -n 1 | awk {'print $2'}`M
+cat << EOF
+
+        Uptime: $UPTIME_DAYS days, $UPTIME_HOURS hours, $UPTIME_MINS minutes
+        Memory: `free -m | head -n 2 | tail -n 1 | awk {'print $4'}`M | `free -m | head -n 2 | tail -n 1 | awk {'print $2'}`
+        CPU: `cat /proc/loadavg | awk '{print $1 ", " $2 ", " $3 " (1, 5, 15 min)"}'`
+        Public: $PUBLIC_USED used | $PUBLIC_AVAIL avail. | $PUBLIC_FREE free | $PUBLIC_PCT
+        `check_service plexmediaserver` | `check_service rtorrent` | `check_service radarr` | `check_service sonarr`
+
+
+EOF
