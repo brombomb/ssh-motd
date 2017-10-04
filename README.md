@@ -1,6 +1,9 @@
 # ssh-motd
 A small script to improve my SSH MOTD
 
+![](https://github.com/brombomb/ssh-motd/blob/screenshot/motd.PNG?raw=true "MOTD")
+
+
 In Ubuntu the scripts live at `/etc/update-motd.d`
 
 `10-server-stats` is the shell script that prints out some simple at a glance server info.  The number 10 says when to run it.
