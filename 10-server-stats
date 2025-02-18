@@ -3,24 +3,11 @@
 UPTIME_DAYS=$(expr `cat /proc/uptime | cut -d '.' -f1` % 31556926 / 86400)
 UPTIME_HOURS=$(expr `cat /proc/uptime | cut -d '.' -f1` % 31556926 % 86400 / 3600)
 UPTIME_MINS=$(expr `cat /proc/uptime | cut -d '.' -f1` % 31556926 % 86400 % 3600 / 60)
-PUBLIC_AVAIL=$(expr `df -h | grep brombomb | awk '{ a = $2 } END {print a }'`)
-PUBLIC_USED=$(expr `df -h | grep brombomb | awk '{ a = $3 } END {print a }'`)
-PUBLIC_FREE=$(expr `df -h | grep brombomb | awk '{ a = $4 } END {print a }'`)
-PUBLIC_PCT=$(expr `df -h | grep brombomb | awk '{ a = $5 } END {print a }'`)
-DOCKER_CONTAINERS=$(cat /etc/update-motd.d/docker-stats.txt)
-
-#SERVICES
-check_service() {
-    GREEN="\e[92m"
-    RED="\e[31m"
-    END_COLOR="\e[0m"
-
-    if [ `systemctl is-active $1` == "active" ]; then
-        echo -e "${GREEN}${1}${END_COLOR}"
-    else
-        echo -e "${RED}${1}${END_COLOR}"
-    fi;
-}
+PUBLIC_AVAIL=$(expr `df -h | grep sda1 | awk '{ a = $2 } END {print a }'`)
+PUBLIC_USED=$(expr `df -h | grep sda1 | awk '{ a = $3 } END {print a }'`)
+PUBLIC_FREE=$(expr `df -h | grep sda1 | awk '{ a = $4 } END {print a }'`)
+PUBLIC_PCT=$(expr `df -h | grep sda1 | awk '{ a = $5 } END {print a }'`)
+DOCKER_CONTAINERS=$(</etc/update-motd.d/docker-stats.txt)
 
 echo "
 
@@ -36,10 +23,6 @@ cat << EOF
         Memory: `free -m | head -n 2 | tail -n 1 | awk {'print $4'}`M | `free -m | head -n 2 | tail -n 1 | awk {'print $2'}`
         CPU: `cat /proc/loadavg | awk '{print $1 ", " $2 ", " $3 " (1, 5, 15 min)"}'`
         Public: $PUBLIC_USED used | $PUBLIC_AVAIL avail. | $PUBLIC_FREE free | $PUBLIC_PCT 
-        `check_service plexmediaserver` 
-	DOCKER: 
 $DOCKER_CONTAINERS
 
-
 EOF
-

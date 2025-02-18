@@ -1,3 +1,84 @@
-#!/bin/sh
-docker ps --format "table {{.Names}}\t{{.Status}}" | tail -n +2 | awk '{print "\t  "$0}' > /etc/update-motd.d/docker-stats.txt
-date >> /etc/update-motd.d/docker-stats.txt
+#!/bin/bash
+
+generate_docker_stats() {
+    # Define color codes for echo
+    GREEN=$(echo -e "\033[32m")
+    RED=$(echo -e "\033[31m")
+    BOLD=$(echo -e "\033[1m")
+    RESET=$(echo -e "\033[0m")
+
+    # Check if docker is available and running
+    if ! command -v docker &> /dev/null || ! docker info &> /dev/null; then
+        exit 0  # Silent exit if docker is not available
+    fi
+
+    # Get container names and statuses, sort by name
+    mapfile -t data < <(docker ps -a --format "{{.Names}}|{{.Status}}" | sort)
+    
+    # Exit if no containers found
+    if [ ${#data[@]} -eq 0 ]; then
+        printf "\tNo Docker containers found.\n"
+        exit 0
+    fi
+    
+    # Extract names and statuses from sorted data
+    containers=()
+    statuses=()
+    for entry in "${data[@]}"; do
+        IFS='|' read -r name status <<< "$entry"
+        containers+=("$name")
+        # Remove (healthy) from status
+        status=${status//(healthy)/}
+        statuses+=("$status")
+    done
+
+    # Find max width for columns
+    max_name_length=0
+    max_status_length=0
+
+    for ((i=0; i<${#containers[@]}; i++)); do
+        (( ${#containers[i]} > max_name_length )) && max_name_length=${#containers[i]}
+        (( ${#statuses[i]} > max_status_length )) && max_status_length=${#statuses[i]}
+    done
+
+    # Define padding based on max lengths
+    col1_width=$((max_name_length + 2))
+    col2_width=$((max_status_length + 2))
+
+    # Calculate total table width
+    table_width=$((col1_width + col2_width + 3))
+
+    # Print table header
+    printf "\n\t┌%s┐\n" "$(printf '─%.0s' $(seq 1 $((table_width * 2 + 1))))"
+    printf "\t│ ${BOLD}%-*s${RESET} │ ${BOLD}%-*s${RESET} │ ${BOLD}%-*s${RESET} │ ${BOLD}%-*s${RESET} │\n" \
+        "$col1_width" "CONTAINER" "$((col2_width - 2))" "STATUS" "$col1_width" "CONTAINER" "$((col2_width - 2))" "STATUS"
+    printf "\t├%s┤\n" "$(printf '─%.0s' $(seq 1 $((table_width * 2 + 1))))"
+
+
+    # Print container statuses in two columns
+    for ((i=0; i<${#containers[@]}; i+=2)); do
+        color1=$([[ ${statuses[i]} =~ ^Up ]] && echo "$GREEN" || echo "$RED")
+        color2=""
+        if [[ $((i+1)) -lt ${#containers[@]} ]]; then
+            color2=$([[ ${statuses[i+1]} =~ ^Up ]] && echo "$GREEN" || echo "$RED")
+        fi
+        
+        # First column pair
+        printf "\t│ %s%-*s%s │ %-*s" "$color1" "$col1_width" "${containers[i]}" "$RESET" "$((col2_width - 2))" "${statuses[i]}"
+        
+        # Second column pair (if exists)
+        if [[ $((i+1)) -lt ${#containers[@]} ]]; then
+            printf " │ %s%-*s%s │ %-*s │\n" "$color2" "$col1_width" "${containers[i+1]}" "$RESET" "$((col2_width - 2))" "${statuses[i+1]}"
+        else
+            printf " │ %-*s │ %-*s │\n" "$col1_width" "" "$((col2_width - 2))" ""
+        fi
+    done
+
+    # Print bottom border
+    printf "\t└%s┘\n\n" "$(printf '─%.0s' $(seq 1 $((table_width * 2 + 1))))"
+}
+
+# Run the function if this script is executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    generate_docker_stats
+fi
