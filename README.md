@@ -1,7 +1,8 @@
 # ssh-motd
 A small script to improve my SSH MOTD
 
-![](https://github.com/brombomb/ssh-motd/blob/screenshot/motd.PNG?raw=true "MOTD")
+![image](https://github.com/user-attachments/assets/eb75ad4f-7d92-424c-a907-f1fa84211c41)
+
 
 
 In Ubuntu the scripts live at `/etc/update-motd.d`
