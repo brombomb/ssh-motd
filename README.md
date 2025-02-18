@@ -13,10 +13,22 @@ In Ubuntu the scripts live at `/etc/update-motd.d`
 `cron-docker-stats` can be run (as root) to generate a list of docker containers and their most recent status.
 
 ```
-	DOCKER:
-	  cloudfare-ddns               Up 10 days
-	  home-assistant               Up 10 days
-	  swag                         Up 10 days
+	┌─────────────────────────────────────────────────────────────────────┐
+	│ CONTAINER          │ STATUS      │ CONTAINER          │ STATUS      │
+	├─────────────────────────────────────────────────────────────────────┤
+	│ cloudflare-ddns    │ Up 5 days   │ grafana            │ Up 5 days   │
+	│ homeassistant      │ Up 2 days   │ homepage           │ Up 5 days   │
+	│ jackett            │ Up 7 hours  │ mealie             │ Up 5 days   │
+	│ mqtt               │ Up 2 days   │ netdata            │ Up 7 hours  │
+	│ overseerr          │ Up 4 days   │ plex               │ Up 4 days   │
+	│ portainer-backup   │ Up 5 days   │ portainer          │ Up 5 days   │
+	│ qbittorrent        │ Up 31 hours │ radarr             │ Up 7 hours  │
+	│ sonarr             │ Up 5 days   │ swag               │ Up 2 days   │
+	│ tautulli           │ Up 3 days   │ tesla-geogdo       │ Up 5 days   │
+	│ teslamate-db       │ Up 3 days   │ teslamate          │ Up 5 days   │
+	│ watchtower         │ Up 5 days   │                    │             │
+	└─────────────────────────────────────────────────────────────────────┘
+
 ```
 
 For Example:
