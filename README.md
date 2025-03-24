@@ -38,9 +38,15 @@ Call this script in the root cron
 % sudo crontab -e
 ```
 
+
+Move this helper script into cron.d to generate the updated docker stats:
+```
+sudo mv update-motd.sh /etc/cron.d/update-motd.sh
+```
+
 Execute this script every 5 minutes
 ```
-*/5 * * * * "/etc/update-motd.d/cron-docker-stats"
+*/5 * * * * "/etc/cron.d/update-motd.sh"
 ```
 
 `banner.txt` my server name, in a fancy ascii art style. Use a tool like figlet or online here http://www.kammerl.de/ascii/AsciiSignature.php
