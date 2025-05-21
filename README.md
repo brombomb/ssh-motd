@@ -49,7 +49,7 @@ Execute this script every 5 minutes
 */5 * * * * "/etc/cron.d/update-motd.sh"
 ```
 
-`banner.txt` my server name, in a fancy ascii art style. Use a tool like figlet or online here http://www.kammerl.de/ascii/AsciiSignature.php
+`banner.txt` my server name, in a fancy ascii art style. Use a tool like figlet or online here http://www.kammerl.de/ascii/AsciiSignature.php (Aligator3)
 
 
 # Requirements
